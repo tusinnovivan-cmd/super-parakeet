@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Дневник зала</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0e1116">
@@ -166,17 +166,26 @@ body{min-height:100dvh}
 .ex{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 40px;gap:6px}
 .ex .exn{grid-column:1/-1}
 .pcard .x{background:var(--bg)}
+.wrap{margin-inline:auto}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;width:100%;padding:0!important}
+.app{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:none;scrollbar-width:none;
+  padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.app::-webkit-scrollbar{display:none}
+*{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+button,.day,.it{touch-action:manipulation}
+.sheet,.lb{overscroll-behavior:contain}
 @media (prefers-reduced-motion:reduce){.splash{transition:none}}
 @media (prefers-reduced-motion:reduce){.fl svg.flick{animation:none}}
 @media (prefers-reduced-motion:reduce){.sw .t,.sw .t::after{transition:none}}
-html body{padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
 </style>
 
 <div class="splash" id="splash">
   <div class="sp-ava" id="spAva"></div>
   <h2 class="sp-t" id="spText"></h2>
 </div>
-<div class="wrap">
+<div class="app"><div class="wrap">
   <div class="top">
     <h1>Дневник зала</h1>
     <div class="stats">
@@ -201,6 +210,7 @@ html body{padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:c
   <div class="row"><button class="btn pri shbtn" id="shareBtn">Поделиться данными</button><button class="btn shbtn" id="setBtn">Настройки</button></div>
 </div>
 
+</div>
 <div class="overlay" id="ov" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">
     <div class="sh-head"><h3 id="shTitle"></h3><button class="x" id="close" aria-label="Закрыть">✕</button></div>
