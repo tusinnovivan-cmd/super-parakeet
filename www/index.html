@@ -210,6 +210,11 @@ button,.day,.it{touch-action:manipulation}
 .bd{fill:color-mix(in srgb,var(--bg),#fff 15%);stroke:color-mix(in srgb,var(--bg),#fff 6%);stroke-width:.6}
 .mu{fill:color-mix(in srgb,var(--bg),#fff 25%);stroke:var(--bg);stroke-width:.7;stroke-linejoin:round}
 .mu.on{fill:var(--mus);stroke:color-mix(in srgb,var(--mus),#000 45%)}
+.pw{position:relative}
+.pw .in{padding-right:56px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:var(--r)}
+.eye svg{width:28px;height:28px;display:block;image-rendering:pixelated;shape-rendering:crispEdges}
+.eye:hover{background:var(--surface-2)}
 @media (prefers-reduced-motion:reduce){.splash{transition:none}}
 @media (prefers-reduced-motion:reduce){.fl svg.flick{animation:none}}
 @media (prefers-reduced-motion:reduce){.sw .t,.sw .t::after{transition:none}}
@@ -223,7 +228,7 @@ button,.day,.it{touch-action:manipulation}
   <div class="au-box">
     <h2 class="sp-t">Вход</h2>
     <input class="in" id="auEmail" type="email" autocomplete="email" inputmode="email" placeholder="Почта" aria-label="Почта">
-    <input class="in" id="auPass" type="password" autocomplete="current-password" placeholder="Пароль, от 6 символов" aria-label="Пароль">
+    <div class="pw"><input class="in" id="auPass" type="password" autocomplete="current-password" placeholder="Пароль, от 6 символов" aria-label="Пароль"><button type="button" class="eye" id="auEye" aria-label="Показать пароль" aria-pressed="false"></button></div>
     <button class="btn pri shbtn" id="auIn">Войти</button>
     <button class="btn shbtn" id="auUp">Создать аккаунт</button>
     <p class="msg" id="auMsg" role="status"></p>
@@ -840,6 +845,36 @@ button,.day,.it{touch-action:manipulation}
   showSplash();
 
   if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io|netlify|tiiny/.test(location.host)){try{navigator.serviceWorker.register('sw.js')}catch(e){}}
+  /* eye */
+  function eyeSvg(open){
+    var N=16,c=(N-1)/2,o='<svg viewBox="0 0 '+N+' '+N+'" aria-hidden="true">';
+    function hex(n){return ('0'+Math.round(n).toString(16)).slice(-2)}
+    function mix(a,b,t){return '#'+[0,1,2].map(function(i){return hex(parseInt(a.substr(1+i*2,2),16)*(1-t)+parseInt(b.substr(1+i*2,2),16)*t)}).join('')}
+    for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+      var dx=x-c,dy=y-c,r=Math.sqrt(dx*dx+dy*dy);
+      if(r>7.6)continue;
+      var col;
+      if(Math.abs(dx)<1.2&&Math.abs(dy)<4.6)col=(Math.abs(dx)<.8&&Math.abs(dy)<4.1)?'#06210f':'#154d1c';
+      else{
+        var h=Math.sqrt((x-5)*(x-5)+(y-5)*(y-5)),t=Math.min(1,r/7.6);
+        col=t>.82?mix('#1c5a52','#0d3433',(t-.82)/.18):mix('#9fe03c','#2f8f7a',Math.min(1,t/.82));
+        if(h<2.2)col=mix('#f2ffc4',col,h/2.6);
+      }
+      o+='<rect x="'+x+'" y="'+y+'" width="1.02" height="1.02" fill="'+col+'"/>';
+    }
+    if(!open){for(var i=2;i<=13;i++)o+='<rect x="'+i+'" y="'+(15-i)+'" width="1.4" height="1.4" fill="#ff6b6b"/>'}
+    return o+'</svg>';
+  }
+  function eyeSet(show){
+    var i=$('auPass'),b=$('auEye');
+    i.type=show?'text':'password';
+    b.innerHTML=eyeSvg(show);
+    b.setAttribute('aria-pressed',show?'true':'false');
+    b.setAttribute('aria-label',show?'Скрыть пароль':'Показать пароль');
+  }
+  eyeSet(false);
+  $('auEye').onclick=function(){eyeSet($('auPass').type==='password')};
+
   /* cloud */
   var SB_URL='https://ucfiovmncvuhprebdraf.supabase.co',SB_KEY='sb_publishable_lb-B6DZ7v4I82RMPKDOG7A_vGc3W3N2';
   var CLOUD=!!SB_URL&&!!SB_KEY;
