@@ -1,5 +1,8 @@
 {
   "appId": "com.gymdiary.app",
   "appName": "Дневник зала",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "url": "https://tusinnovivan-cmd.github.io/super-parakeet/"
+  }
 }
