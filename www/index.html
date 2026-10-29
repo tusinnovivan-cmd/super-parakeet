@@ -176,6 +176,32 @@ body{position:fixed;inset:0;width:100%;padding:0!important}
 input,textarea{-webkit-user-select:text;user-select:text}
 button,.day,.it{touch-action:manipulation}
 .sheet,.lb{overscroll-behavior:contain}
+.splash [data-fr],.ava-s[data-fr]{}
+[data-fr]:not([data-fr="0"]){border-width:4px}
+.sp-ava[data-fr]:not([data-fr="0"]){border-width:7px}
+[data-fr="1"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,conic-gradient(#fff3b0,#d4a017,#8a6508,#ffe27a,#d4a017,#fff3b0) border-box;box-shadow:0 0 10px rgba(212,160,23,.5)}
+[data-fr="2"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,conic-gradient(#ff4d4d,#ffb84d,#f6ff4d,#4dff88,#4dc3ff,#a64dff,#ff4d9e,#ff4d4d) border-box;box-shadow:none}
+[data-fr="3"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,linear-gradient(#22d3ee,#22d3ee) border-box;box-shadow:0 0 14px #22d3ee,0 0 4px #22d3ee}
+[data-fr="4"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,linear-gradient(160deg,#ffd36b,#ff6a1a 50%,#e11d2e) border-box;box-shadow:0 0 14px rgba(255,106,26,.7)}
+[data-fr="5"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,conic-gradient(#e8f7ff,#7cc8ff,#3b82f6,#bfe9ff,#e8f7ff) border-box;box-shadow:0 0 12px rgba(124,200,255,.6)}
+[data-fr="8"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,conic-gradient(#a855f7,#f5d76e,#7c3aed,#f5d76e,#a855f7) border-box;box-shadow:0 0 10px rgba(168,85,247,.5)}
+[data-fr="9"]{border-color:transparent;background:linear-gradient(var(--surface-2),var(--surface-2)) padding-box,conic-gradient(#f4f4f5,#8b8d94,#d9dbe0,#6b6e76,#f4f4f5) border-box;box-shadow:none}
+[data-fr="6"]{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+[data-fr="7"]{border-style:dashed;border-color:var(--accent)}
+.frb{padding:4px;border-radius:50%;border:2px solid transparent;flex:none}
+.frb.sel{border-color:var(--fg)}
+.frb .ava-s{width:44px;height:44px;display:block}
+.app{overflow:hidden}
+.wrap{height:100%;max-width:720px;gap:12px}
+#viewCal{flex:1;min-height:0;gap:10px}
+#cal{flex:1;min-height:200px;grid-template-rows:repeat(6,minmax(0,1fr))}
+.day{aspect-ratio:auto;min-height:0}
+.streak{min-height:0;padding:10px 16px}
+#viewList{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+#viewList::-webkit-scrollbar{display:none}
+.auth{position:fixed;inset:0;height:100dvh;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.au-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.lnk{color:var(--muted);text-decoration:underline;min-height:44px}
 @media (prefers-reduced-motion:reduce){.splash{transition:none}}
 @media (prefers-reduced-motion:reduce){.fl svg.flick{animation:none}}
 @media (prefers-reduced-motion:reduce){.sw .t,.sw .t::after{transition:none}}
@@ -184,6 +210,17 @@ button,.day,.it{touch-action:manipulation}
 <div class="splash" id="splash">
   <div class="sp-ava" id="spAva"></div>
   <h2 class="sp-t" id="spText"></h2>
+</div>
+<div class="auth" id="auth" hidden>
+  <div class="au-box">
+    <h2 class="sp-t">Вход</h2>
+    <input class="in" id="auEmail" type="email" autocomplete="email" inputmode="email" placeholder="Почта" aria-label="Почта">
+    <input class="in" id="auPass" type="password" autocomplete="current-password" placeholder="Пароль, от 6 символов" aria-label="Пароль">
+    <button class="btn pri shbtn" id="auIn">Войти</button>
+    <button class="btn shbtn" id="auUp">Создать аккаунт</button>
+    <p class="msg" id="auMsg" role="status"></p>
+    <button class="lnk" id="auSkip">Продолжить без аккаунта</button>
+  </div>
 </div>
 <div class="app"><div class="wrap">
   <div class="top">
@@ -202,12 +239,13 @@ button,.day,.it{touch-action:manipulation}
     <h2 id="title"></h2>
     <button id="next" aria-label="Следующий месяц">›</button>
   </div>
+  <div class="grid" id="dowRow"></div>
   <div class="grid" id="cal"></div>
   <div class="legend"><span>был в зале</span><span>есть заметка, фото или спортпит</span></div>
   </div>
   <div id="viewList" class="vcol" hidden></div>
   <button class="btn pri shbtn" id="planBtn">Мой план</button>
-  <div class="row"><button class="btn pri shbtn" id="shareBtn">Поделиться данными</button><button class="btn shbtn" id="setBtn">Настройки</button></div>
+  <button id="setBtn" hidden>Настройки</button>
 </div>
 
 </div>
@@ -240,11 +278,19 @@ button,.day,.it{touch-action:manipulation}
 <div class="overlay" id="ov3" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT3">
     <div class="sh-head"><h3 id="shT3">Настройки</h3><button class="x" id="close3" aria-label="Закрыть">✕</button></div>
+    <div class="sec" id="acBox">
+      <h4>Аккаунт</h4>
+      <p class="msg" id="acMail" style="color:var(--fg)"></p>
+      <p class="msg" id="cloudStat"></p>
+      <button class="btn shbtn" id="acBtn">Войти</button>
+    </div>
     <div class="sec">
       <h4>Профиль</h4>
       <div class="prof"><div class="ava-s" id="avaPrev"></div><input class="in" id="nameIn" placeholder="Твоё имя" maxlength="30" aria-label="Имя"></div>
       <div class="row"><button class="btn shbtn" id="avaBtn">Фото профиля</button><button class="btn shbtn" id="avaDel">Убрать фото</button></div>
       <input type="file" id="avaFile" accept="image/*" hidden>
+      <h4>Рамка аватара</h4>
+      <div class="sws" id="frames"></div>
     </div>
     <div class="sec"><h4>Цвет фона</h4><div class="sws" id="sws"></div></div>
     <div class="sec"><h4>Свой цвет</h4><input type="color" id="bgColor" class="colorin" aria-label="Свой цвет фона"></div>
@@ -259,6 +305,7 @@ button,.day,.it{touch-action:manipulation}
     <div class="sec"><h4>Цвет акцента</h4><div class="sws" id="accs"></div><input type="color" id="accColor" class="colorin" aria-label="Свой цвет акцента"></div>
     <div class="sec"><h4>Углы элементов</h4><div class="chips" id="rads"></div></div>
     <button class="btn shbtn" id="stReset">Сбросить оформление</button>
+    <button class="btn pri shbtn" id="shareBtn">Поделиться данными</button>
     <div class="rules">
       <h4>Важно: правила огонька</h4>
       <ul>
@@ -315,13 +362,17 @@ button,.day,.it{touch-action:manipulation}
       req.onerror=function(){res()};
     }catch(e){res()}
   })}
-  function save(k){
+  function save(k,noSync){
     var v=days.get(k);
-    if(!db)return;
-    try{
-      var st=db.transaction('days','readwrite').objectStore('days');
-      if(isEmpty(v)){days.delete(k);st.delete(k)}else st.put(v,k);
-    }catch(e){}
+    if(v&&!noSync)v.u=Date.now();
+    if(db){
+      try{
+        var st=db.transaction('days','readwrite').objectStore('days');
+        if(isEmpty(v))st.delete(k);else st.put(v,k);
+      }catch(e){}
+    }
+    if(isEmpty(v))days.delete(k);
+    if(!noSync)pushDay(k,v);
   }
   function isEmpty(v){return !v||(!v.gym&&!v.note&&!(v.supps&&v.supps.length)&&!(v.photos&&v.photos.length))}
   function get(k){if(!days.has(k))days.set(k,{gym:false,note:'',supps:[],photos:[]});return days.get(k)}
@@ -337,7 +388,7 @@ button,.day,.it{touch-action:manipulation}
   function render(){
     $('title').textContent=MONTHS[cur.m]+' '+cur.y;
     var g=$('cal');g.innerHTML='';
-    DOW.forEach(function(n){var e=document.createElement('div');e.className='dow';e.textContent=n;g.appendChild(e)});
+    var dr=$('dowRow');if(!dr.children.length)DOW.forEach(function(n){var e=document.createElement('div');e.className='dow';e.textContent=n;dr.appendChild(e)});
     var off=(new Date(cur.y,cur.m,1).getDay()+6)%7, total=new Date(cur.y,cur.m+1,0).getDate();
     for(var i=0;i<off;i++){var e=document.createElement('div');e.className='day empty';g.appendChild(e)}
     for(var d=1;d<=total;d++){
@@ -514,7 +565,7 @@ button,.day,.it{touch-action:manipulation}
   /* settings */
   var DEF='#0e1116',PRE=[['Графит','#0e1116'],['Чёрный','#000000'],['Синий','#0a1220'],['Лес','#0b1511'],['Бордо','#1f0f14'],['Фиолет','#120d1c']];
   function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
-  function lsSet(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);return true}catch(e){return false}}
+  function lsSet(k,v){var ok=false;try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);ok=true}catch(e){}if(ok&&META.indexOf(k)>=0)metaTouched();return ok}
   function applyBg(){
     var c=lsGet('gd-bg')||DEF,img=lsGet('gd-img'),st=document.body.style;
     document.documentElement.style.setProperty('--bg',c);
@@ -645,7 +696,7 @@ button,.day,.it{touch-action:manipulation}
   /* profile + splash */
   var AVA_DEF='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="24" r="12" fill="currentColor"/><path d="M8 58c2-14 12-20 24-20s22 6 24 20z" fill="currentColor"/></svg>';
   function fillAva(el){
-    var a=lsGet('gd-ava'),n=(lsGet('gd-name')||'').trim();el.innerHTML='';
+    var a=lsGet('gd-ava'),n=(lsGet('gd-name')||'').trim();el.innerHTML='';el.dataset.fr=lsGet('gd-fr')||'0';
     if(a){var im=document.createElement('img');im.src=a;im.alt='';el.appendChild(im)}
     else if(n)el.textContent=n.charAt(0).toUpperCase();
     else el.innerHTML=AVA_DEF;
@@ -672,6 +723,17 @@ button,.day,.it{touch-action:manipulation}
     avaShrink(f).then(function(u){if(u&&lsSet('gd-ava',u))fillAva($('avaPrev'))});
   };
   $('avaDel').onclick=function(){lsSet('gd-ava',null);fillAva($('avaPrev'))};
+  var FRN=['Классика','Золото','Радуга','Неон','Огонь','Лёд','Двойная','Пунктир','Корона','Хром'];
+  function drawFrames(){
+    var cur=lsGet('gd-fr')||'0',box=$('frames');box.innerHTML='';
+    FRN.forEach(function(nm,i){
+      var b=document.createElement('button');b.className='frb'+(String(i)===cur?' sel':'');b.title=nm;b.setAttribute('aria-label','Рамка '+nm);
+      var a=document.createElement('span');a.className='ava-s';a.dataset.fr=String(i);b.appendChild(a);
+      b.onclick=function(){lsSet('gd-fr',String(i));fillAva($('avaPrev'));drawFrames()};
+      box.appendChild(b);
+    });
+  }
+  $('setBtn').addEventListener('click',drawFrames);
   $('cornerAva').onclick=function(){$('setBtn').click()};
   function showSplash(){
     var n=(lsGet('gd-name')||'').trim(),
@@ -683,6 +745,161 @@ button,.day,.it{touch-action:manipulation}
     sp.onclick=go;setTimeout(go,2600);
   }
   showSplash();
+
+  /* cloud */
+  var SB_URL='https://ucfiovmncvuhprebdraf.supabase.co',SB_KEY='sb_publishable_lb-B6DZ7v4I82RMPKDOG7A_vGc3W3N2';
+  var CLOUD=!!SB_URL&&!!SB_KEY;
+  var META=['gd-bg','gd-img','gd-font','gd-acc','gd-r','gd-name','gd-ava','gd-fr','gd-plan'];
+  var sess=null,syncing=false,applying=false,pt={},mt;
+  function loadSess(){try{sess=JSON.parse(lsGet('gd-sess')||'null')}catch(e){sess=null}}
+  function saveSess(x){sess=x;lsSet('gd-sess',x?JSON.stringify(x):null)}
+  function setStat(t){
+    var el=$('cloudStat');if(!el)return;
+    el.textContent=t==='busy'?'Синхронизация…':t==='ok'?'Всё сохранено в аккаунте':t==='err'?'Нет связи, повторю позже':'';
+  }
+  function updAcct(){
+    $('acBox').hidden=!CLOUD;
+    $('acMail').textContent=sess?sess.email:'Вход не выполнен. Данные хранятся только на этом устройстве';
+    $('acBtn').textContent=sess?'Выйти':'Войти или создать аккаунт';
+    if(!sess)setStat('');
+  }
+  function authReq(path,body){
+    return fetch(SB_URL+'/auth/v1/'+path,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.msg||j.error_description||j.message||'Ошибка');return j})});
+  }
+  function setSessFrom(j){
+    saveSess({access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,email:(j.user&&j.user.email)||'',uid:j.user&&j.user.id});
+  }
+  function token(){
+    if(!sess)return Promise.reject(new Error('no session'));
+    if(sess.exp-Date.now()>60000)return Promise.resolve(sess.access);
+    return authReq('token?grant_type=refresh_token',{refresh_token:sess.refresh}).then(function(j){setSessFrom(j);return sess.access},function(e){
+      if(!/fetch|network/i.test(e.message)){saveSess(null);updAcct();showAuth()}
+      throw e;
+    });
+  }
+  function rest(path,opt){
+    opt=opt||{};
+    return token().then(function(t){
+      var h={apikey:SB_KEY,Authorization:'Bearer '+t,'Content-Type':'application/json'};
+      for(var k in (opt.headers||{}))h[k]=opt.headers[k];
+      return fetch(SB_URL+'/rest/v1/'+path,{method:opt.method||'GET',headers:h,body:opt.body});
+    }).then(function(r){
+      if(!r.ok)return r.text().then(function(t){throw new Error(t||r.status)});
+      return r.status===204?null:r.text().then(function(t){return t?JSON.parse(t):null});
+    });
+  }
+  function pushDay(k,v){
+    if(!sess)return;
+    clearTimeout(pt[k]);
+    pt[k]=setTimeout(function(){
+      if(!sess)return;
+      var c=days.get(k)||v,u=(c&&c.u)||Date.now();
+      var d=isEmpty(c)?{gym:false,note:'',supps:[],photos:[]}:{gym:c.gym,note:c.note,supps:c.supps,photos:c.photos};
+      rest('diary_days?on_conflict=user_id,day',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:sess.uid,day:k,data:d,updated_at:u}])})
+        .then(function(){setStat('ok')},function(){setStat('err')});
+    },1200);
+  }
+  function metaObj(){var o={};META.forEach(function(k){var v=lsGet(k);if(v!=null)o[k]=v});return o}
+  function metaTouched(){
+    if(!sess||applying)return;
+    lsSet('gd-mu',String(Date.now()));
+    clearTimeout(mt);mt=setTimeout(pushMeta,1500);
+  }
+  function pushMeta(){
+    if(!sess)return;
+    var u=+lsGet('gd-mu')||Date.now();
+    rest('diary_meta?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:sess.uid,data:metaObj(),updated_at:u}])})
+      .then(function(){setStat('ok')},function(){setStat('err')});
+  }
+  function fetchDays(){
+    var out=[];
+    function page(off){
+      return rest('diary_days?select=day,data,updated_at&order=day',{headers:{Range:off+'-'+(off+999),'Range-Unit':'items'}}).then(function(rows){
+        rows=rows||[];out=out.concat(rows);return rows.length===1000?page(off+1000):out;
+      });
+    }
+    return page(0);
+  }
+  function reloadLocalPrefs(){
+    try{plan=JSON.parse(lsGet('gd-plan')||'null')}catch(e){plan=null}
+    if(!plan||!Array.isArray(plan.w))plan={w:[]};
+    applyBg();applyStyle();fillAva($('cornerAva'));
+  }
+  function sync(){
+    if(!sess||syncing)return Promise.resolve();
+    syncing=true;setStat('busy');
+    return Promise.all([fetchDays(),rest('diary_meta?select=data,updated_at')]).then(function(res){
+      var rows=res[0],meta=(res[1]||[])[0],remote={};
+      rows.forEach(function(r){remote[r.day]=r});
+      rows.forEach(function(r){
+        var l=days.get(r.day),lu=(l&&l.u)||0;
+        if(r.updated_at>lu){
+          var d=r.data||{};
+          days.set(r.day,{gym:!!d.gym,note:d.note||'',supps:d.supps||[],photos:d.photos||[],u:r.updated_at});
+          save(r.day,true);
+        }
+      });
+      days.forEach(function(v,k){
+        var r=remote[k];
+        if(isEmpty(v))return;
+        if(!r||(v.u||0)>r.updated_at){if(!v.u){v.u=Date.now();save(k,true)}pushDay(k,v)}
+      });
+      var lm=+lsGet('gd-mu')||0;
+      if(meta&&meta.updated_at>lm){
+        applying=true;
+        META.forEach(function(k){var x=meta.data&&meta.data[k];lsSet(k,x!=null?x:null)});
+        lsSet('gd-mu',String(meta.updated_at));
+        applying=false;reloadLocalPrefs();
+      }else if(!meta&&Object.keys(metaObj()).length){
+        lsSet('gd-mu',String(Date.now()));pushMeta();
+      }else if(meta&&lm>meta.updated_at){pushMeta()}
+      render();setStat('ok');syncing=false;
+    }).catch(function(){setStat('err');syncing=false});
+  }
+  function showAuth(){$('auMsg').textContent='';$('auth').hidden=false}
+  function authErr(e){
+    var m=e.message||'';
+    if(/invalid login/i.test(m))return 'Неверная почта или пароль';
+    if(/already registered|already been registered/i.test(m))return 'Эта почта уже зарегистрирована, нажми «Войти»';
+    if(/fetch|network/i.test(m))return 'Нет связи с сервером';
+    if(/password/i.test(m))return 'Пароль слишком короткий или простой';
+    if(/valid email|invalid.*email/i.test(m))return 'Проверь адрес почты';
+    return m||'Не получилось, попробуй ещё раз';
+  }
+  function doAuth(up){
+    var e=$('auEmail').value.trim(),p=$('auPass').value,m=$('auMsg');
+    if(!e||p.length<6){m.textContent='Введи почту и пароль от 6 символов';return}
+    m.textContent='Подожди…';
+    authReq(up?'signup':'token?grant_type=password',{email:e,password:p}).then(function(j){
+      if(!j.access_token){m.textContent='Нужно подтвердить почту. Проверь письмо и войди';return}
+      setSessFrom(j);if(!sess.email)sess.email=e;saveSess(sess);
+      $('auth').hidden=true;$('auPass').value='';
+      updAcct();sync();
+    }).catch(function(er){m.textContent=authErr(er)});
+  }
+  $('auIn').onclick=function(){doAuth(false)};
+  $('auUp').onclick=function(){doAuth(true)};
+  $('auPass').onkeydown=function(e){if(e.key==='Enter')doAuth(false)};
+  $('auSkip').onclick=function(){lsSet('gd-skip','1');$('auth').hidden=true};
+  var armedOut=false,outT;
+  $('acBtn').onclick=function(){
+    var b=this;
+    if(!sess){$('ov3').hidden=true;showAuth();return}
+    if(!armedOut){armedOut=true;b.textContent='Выйти? Данные на этом устройстве очистятся, в аккаунте останутся. Нажми ещё раз';outT=setTimeout(function(){armedOut=false;updAcct()},4000);return}
+    clearTimeout(outT);armedOut=false;
+    saveSess(null);days.clear();
+    if(db){try{db.transaction('days','readwrite').objectStore('days').clear()}catch(e){}}
+    META.concat(['gd-mu']).forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+    reloadLocalPrefs();render();updAcct();
+    $('ov3').hidden=true;showAuth();
+  };
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)sync()});
+  function startCloud(){
+    if(!CLOUD){updAcct();return}
+    loadSess();updAcct();
+    if(sess)sync();else if(!lsGet('gd-skip'))showAuth();
+  }
 
   /* share */
   function enc(withPh){
@@ -729,7 +946,7 @@ button,.day,.it{touch-action:manipulation}
   };
 
   render();
-  openDB().then(function(d){db=d;return loadAll()}).then(render);
+  openDB().then(function(d){db=d;return loadAll()}).then(function(){render();startCloud()});
 })();
 </script>
 
