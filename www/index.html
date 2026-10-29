@@ -813,6 +813,7 @@ button,.day,.it{touch-action:manipulation}
   }
   showSplash();
 
+  if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io|netlify|tiiny/.test(location.host)){try{navigator.serviceWorker.register('sw.js')}catch(e){}}
   /* cloud */
   var SB_URL='https://ucfiovmncvuhprebdraf.supabase.co',SB_KEY='sb_publishable_lb-B6DZ7v4I82RMPKDOG7A_vGc3W3N2';
   var CLOUD=!!SB_URL&&!!SB_KEY;
