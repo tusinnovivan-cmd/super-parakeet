@@ -2,6 +2,7 @@ name: Build APK
 on:
   push:
     branches: [main, master]
+    paths-ignore: ['www/**']
   workflow_dispatch:
 jobs:
   build:
