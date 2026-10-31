@@ -317,10 +317,18 @@ html[data-ds=sq] #cal,html[data-ds=ci] #cal{grid-template-rows:none;grid-auto-ro
 html[data-ds=sq] .day,html[data-ds=ci] .day{aspect-ratio:1/1;width:100%;min-height:0}
 html[data-ds=ci] .day{border-radius:50%}
 html[data-ds=ci] .day.empty{border-radius:50%}
+.sp-row{position:relative;display:flex;align-items:center;justify-content:center}
+.sp-cry{position:absolute;width:max-content;left:calc(100% - 6px);top:-12px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.sp-cry img{height:56px!important;width:auto!important;max-width:none!important}
+.sp-cry svg{width:72px;height:auto}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hrow h4{margin:0}
+.hrow .x.lockb{height:32px}
+.lk .chip.on{pointer-events:none}
 </style>
 
 <div class="splash" id="splash">
-  <div class="sp-ava" id="spAva"></div>
+  <div class="sp-row"><div class="sp-ava" id="spAva"></div><div class="sp-cry" id="spCry"></div></div>
   <h2 class="sp-t" id="spText"></h2>
 </div>
 <div class="auth" id="auth" hidden>
@@ -378,8 +386,8 @@ html[data-ds=ci] .day.empty{border-radius:50%}
       <button class="btn shbtn" id="dplAdd">+ Добавить план или упражнение</button>
       <div id="dplPick" class="dplpick" hidden></div>
     </div>
-    <div class="sec">
-      <h4>Спортпит</h4>
+    <div class="sec" id="supSec">
+      <div class="hrow"><h4>Спортпит</h4><span id="supLockHost"></span></div>
       <div class="chips" id="chips"></div>
       <div id="sups" class="sec"></div>
       <div class="add"><input class="in" id="custom" placeholder="Другая добавка" maxlength="40"><button class="btn" id="addSup">Добавить</button></div>
@@ -437,6 +445,14 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     </div>
     <div class="sec"><h4>Цвет фона</h4><div class="sws" id="sws"></div></div>
     <div class="sec"><h4>Свой цвет</h4><input type="color" id="bgColor" class="colorin" aria-label="Свой цвет фона"></div>
+    <div class="sec">
+      <h4>Фон приветствия</h4>
+      <div class="sws" id="spBgs"></div>
+      <input type="color" id="spBgColor" class="colorin" aria-label="Свой цвет фона приветствия">
+      <div class="row"><button class="btn shbtn" id="spBgPhoto">Выбрать фото</button><button class="btn shbtn" id="spBgReset">Сбросить</button></div>
+      <input type="file" id="spBgFile" accept="image/*" hidden>
+      <button class="btn shbtn" id="spBgView">Посмотреть приветствие</button>
+    </div>
     <div class="sec">
       <h4>Фото на фон</h4>
       <button class="btn shbtn" id="bgPhoto">Выбрать фото</button>
@@ -701,7 +717,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   }
   function renderStreak(){
     var inf=streakInfo(),n=inf.alive?inf.n:0,lv=Math.min(5,Math.floor(n/10)),L=LV[lv],txt;
-    $('fl').innerHTML=crySvg(L,lv,n>0);
+    $('fl').innerHTML=crySvg(L,lv,n>0);if($('spCry'))$('spCry').innerHTML=crySvg(L,lv,n>0);
     $('stN').textContent=n;
     if(!inf.n)txt='Отметь первый день в зале';
     else if(!inf.alive)txt='Жила потускнела. Серия оборвалась, было '+inf.n;
@@ -792,7 +808,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     });
   }
   applyBg();
-  $('setBtn').onclick=function(){drawDs();drawUi();drawLogo();drawTheme();$('msg3').textContent='';$('bgColor').value=lsGet('gd-bg')||DEF;drawSw();$('ov3').hidden=false};
+  $('setBtn').onclick=function(){drawSpBg();drawDs();drawUi();drawLogo();drawTheme();$('msg3').textContent='';$('bgColor').value=lsGet('gd-bg')||DEF;drawSw();$('ov3').hidden=false};
   $('close3').onclick=function(){$('ov3').hidden=true};
   $('ov3').addEventListener('click',function(e){if(e.target===$('ov3'))$('ov3').hidden=true});
   $('bgColor').oninput=function(){lsSet('gd-bg',this.value);applyBg();drawSw()};
@@ -861,6 +877,36 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   }
   $('gtColor').oninput=function(){lsSet('gd-gt',this.value);applyTheme();drawTheme()};
   applyTheme();
+
+
+  /* splash background */
+  function applySpBg(){
+    var sp=$('splash'),c=lsGet('gd-sbg'),im=lsGet('gd-simg');
+    sp.style.background=im?'linear-gradient(rgba(8,10,14,.4),rgba(8,10,14,.4)),url("'+im+'") center/cover no-repeat':(c||'');
+  }
+  function drawSpBg(){
+    var cur=lsGet('gd-sbg')||'',box=$('spBgs');box.innerHTML='';
+    PRE.forEach(function(p){
+      var b=document.createElement('button');b.className='swc'+(p[1]===cur?' on':'');b.style.background=p[1];b.setAttribute('aria-label',p[0]);b.title=p[0];
+      b.onclick=function(){lsSet('gd-sbg',p[1]);lsSet('gd-simg',null);applySpBg();drawSpBg()};box.appendChild(b);
+    });
+    $('spBgColor').value=/^#[0-9a-f]{6}$/i.test(cur)?cur:(lsGet('gd-bg')||DEF);
+  }
+  $('spBgColor').oninput=function(){lsSet('gd-sbg',this.value);lsSet('gd-simg',null);applySpBg();drawSpBg()};
+  $('spBgPhoto').onclick=function(){$('spBgFile').click()};
+  $('spBgFile').onchange=function(){
+    var f=this.files[0];this.value='';if(!f)return;
+    shrink(f).then(function(u){if(!u)return;
+      if(lsSet('gd-simg',u)){applySpBg();$('msg3').textContent='Фон приветствия обновлён'}else $('msg3').textContent='Фото слишком большое, выбери другое';
+    });
+  };
+  $('spBgReset').onclick=function(){lsSet('gd-sbg',null);lsSet('gd-simg',null);applySpBg();drawSpBg();$('msg3').textContent='Фон приветствия сброшен'};
+  $('spBgView').onclick=function(){
+    var sp=$('splash');$('ov3').hidden=true;sp.hidden=false;sp.classList.remove('out');
+    var done=false;function go(){if(done)return;done=true;sp.classList.add('out');setTimeout(function(){sp.hidden=true;$('ov3').hidden=false},400)}
+    sp.onclick=go;setTimeout(go,2600);
+  };
+  applySpBg();
 
   /* look */
   var FONTS=[['Классика',"'Barlow Condensed','Arial Narrow',sans-serif","'Barlow',system-ui,sans-serif"],
@@ -931,6 +977,8 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     function st(){var u=UNL.has(obj);card.classList.toggle('lk',!u);b.innerHTML=lockSvg(u);b.setAttribute('aria-label',u?'Закрыть замок':'Открыть замок: можно удалять')}
     b.onclick=function(){if(UNL.has(obj))UNL.delete(obj);else UNL.add(obj);st()};st();return b;
   }
+
+  var SUPLK={};$('supLockHost').appendChild(lockBtn($('supSec'),SUPLK));
 
   /* plan */
   var plan;try{plan=JSON.parse(lsGet('gd-plan')||'null')}catch(e){plan=null}
@@ -1331,7 +1379,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   /* cloud */
   var SB_URL='https://ucfiovmncvuhprebdraf.supabase.co',SB_KEY='sb_publishable_lb-B6DZ7v4I82RMPKDOG7A_vGc3W3N2';
   var CLOUD=!!SB_URL&&!!SB_KEY;
-  var META=['gd-bg','gd-img','gd-font','gd-acc','gd-mus','gd-r','gd-name','gd-ava','gd-fr','gd-plan','gd-sups','gd-th','gd-gt','gd-lv','gd-ui','gd-lg','gd-ds'];
+  var META=['gd-bg','gd-img','gd-font','gd-acc','gd-mus','gd-r','gd-name','gd-ava','gd-fr','gd-plan','gd-sups','gd-th','gd-gt','gd-lv','gd-ui','gd-lg','gd-ds','gd-sbg','gd-simg'];
   var sess=null,syncing=false,applying=false,pt={},mt;
   function loadSess(){try{sess=JSON.parse(lsGet('gd-sess')||'null')}catch(e){sess=null}}
   function saveSess(x){sess=x;lsSet('gd-sess',x?JSON.stringify(x):null)}
@@ -1407,7 +1455,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     try{plan=JSON.parse(lsGet('gd-plan')||'null')}catch(e){plan=null}
     if(!plan||!Array.isArray(plan.w))plan={w:[]};
     try{sups=JSON.parse(lsGet('gd-sups')||'[]')}catch(e){sups=[]}if(!Array.isArray(sups))sups=[];
-    applyBg();applyTheme();applyUi();applyLogo();applyDs();applyStyle();fillAva($('cornerAva'));fillAva($('navAva'));
+    applyBg();applyTheme();applyUi();applyLogo();applyDs();applySpBg();applyStyle();fillAva($('cornerAva'));fillAva($('navAva'));
   }
   function sync(){
     if(!sess||syncing)return Promise.resolve();
