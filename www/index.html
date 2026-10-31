@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>body skill</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0e1116">
@@ -7,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="body skill">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap">
 <style>
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 /* Layout: центрированная колонка, календарь сверху, карточка дня выезжает снизу */
 :root{
   --bg:#0e1116; --surface:color-mix(in srgb,var(--bg),#fff 6%); --surface-2:color-mix(in srgb,var(--bg),#fff 11%); --line:color-mix(in srgb,var(--bg),#fff 19%);
@@ -411,7 +417,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
 </div>
 <div class="overlay" id="ov3" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT3">
-    <div class="sh-head"><div style="min-width:0"><h3 id="shT3">Настройки</h3><div id="acSince" style="font-size:12px;opacity:.6;margin-top:4px" hidden></div></div><button class="x" id="close3" aria-label="Закрыть">✕</button></div>
+    <div class="sh-head"><h3 id="shT3">Настройки</h3><button class="x" id="close3" aria-label="Закрыть">✕</button></div>
     <div class="sec" id="acBox">
       <h4>Аккаунт</h4>
       <p class="msg" id="acMail" style="color:var(--fg)"></p>
@@ -1386,22 +1392,13 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     $('acMail').textContent=sess?sess.email:'Вход не выполнен. Данные хранятся только на этом устройстве';
     $('acBtn').textContent=sess?'Выйти':'Войти или создать аккаунт';
     if(!sess)setStat('');
-    var el=$('acSince');
-    if(el){
-      if(sess&&sess.since){var d=new Date(sess.since);el.textContent='Аккаунт с '+d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});el.hidden=false}
-      else{el.hidden=true;
-        if(sess&&sess.access&&!sess._sf){sess._sf=1;
-          fetch(SB_URL+'/auth/v1/user',{headers:{apikey:SB_KEY,Authorization:'Bearer '+sess.access}}).then(function(r){return r.json()}).then(function(u){
-            if(u&&u.created_at&&sess){var x=JSON.parse(JSON.stringify(sess));delete x._sf;x.since=u.created_at;saveSess(x);updAcct()}
-          }).catch(function(){})}}
-    }
   }
   function authReq(path,body){
     return fetch(SB_URL+'/auth/v1/'+path,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.msg||j.error_description||j.message||'Ошибка');return j})});
   }
   function setSessFrom(j){
-    saveSess({access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,email:(j.user&&j.user.email)||'',uid:j.user&&j.user.id,since:(j.user&&j.user.created_at)||''});
+    saveSess({access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,email:(j.user&&j.user.email)||'',uid:j.user&&j.user.id});
   }
   function token(){
     if(!sess)return Promise.reject(new Error('no session'));
@@ -1583,3 +1580,5 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   openDB().then(function(d){db=d;return loadAll()}).then(function(){render();startCloud()});
 })();
 </script>
+
+</html>
