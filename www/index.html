@@ -421,6 +421,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
       <div class="row"><input class="in" id="rmDate" type="date" aria-label="День"><input class="in" id="rmTime" type="time" aria-label="Время (необязательно)"></div>
       <p class="msg">Время можно не указывать, тогда придёт в 09:00.</p>
       <button class="btn pri shbtn" id="rmAdd">Добавить</button>
+      <button class="btn shbtn" id="rmTest">Проверить уведомление (через 10 сек)</button>
       <p class="msg" id="rmMsg" role="status"></p>
     </div>
     <div class="sec"><h4>Мои напоминания</h4><div id="rmList" class="sec"></div></div>
@@ -1409,10 +1410,30 @@ html[data-ds=ci] .day.empty{border-radius:50%}
       }).catch(function(){});
     }catch(e){}
   }
+  function remLN(){return window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications}
   function remPerm(){
-    var LN=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications;
-    if(LN){try{LN.requestPermissions().catch(function(){})}catch(e){}}
-    else if(window.Notification&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
+    var LN=remLN();
+    if(LN){
+      return LN.checkPermissions().then(function(r){return r.display==='granted'?r:LN.requestPermissions()}).then(function(r){
+        if(r.display!=='granted')return 'denied';
+        if(LN.checkExactNotificationSetting){
+          return LN.checkExactNotificationSetting().then(function(e){
+            if(e.exact_alarm==='granted')return 'ok';
+            try{LN.changeExactNotificationSetting()}catch(x){}
+            return 'exact';
+          }).catch(function(){return 'ok'});
+        }
+        return 'ok';
+      }).catch(function(){return 'err'});
+    }
+    if(window.Notification&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
+    return Promise.resolve('nonative');
+  }
+  function remNote(st){
+    return st==='denied'?'Уведомления запрещены. Включи их для body skill в настройках телефона':
+      st==='exact'?'Разреши «Будильники и напоминания» для body skill, иначе уведомление может опоздать':
+      st==='nonative'?'В этой версии приложения уведомления работают только пока оно открыто. Нужна новая сборка APK':
+      st==='err'?'Не удалось включить уведомления':'Напоминание добавлено';
   }
   /* fallback while app is open (no native plugin) */
   setInterval(function(){
@@ -1438,8 +1459,18 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     if(!x){$('rmMsg').textContent='Напиши, что напомнить';return}
     if(!d){$('rmMsg').textContent='Выбери день';return}
     rems.push({id:Date.now(),d:d,t:t||'',x:x,seen:false});
-    $('rmText').value='';$('rmTime').value='';$('rmMsg').textContent='Напоминание добавлено';
-    remPerm();remSave();remDraw();
+    $('rmText').value='';$('rmTime').value='';
+    remSave();remDraw();
+    remPerm().then(function(st){$('rmMsg').textContent=remNote(st);remSchedule()});
+  };
+  $('rmTest').onclick=function(){
+    var LN=remLN();
+    remPerm().then(function(st){
+      if(st!=='ok'&&st!=='exact'){$('rmMsg').textContent=remNote(st);return}
+      LN.schedule({notifications:[{id:999999,title:'body skill',body:'Проверка уведомлений',schedule:{at:new Date(Date.now()+10000),allowWhileIdle:true}}]})
+        .then(function(){$('rmMsg').textContent='Закрой приложение. Через 10 секунд придёт уведомление'})
+        .catch(function(e){$('rmMsg').textContent='Ошибка: '+(e&&e.message||e)});
+    });
   };
   remLoad();remRefresh();remSchedule();
   /* settings tabs */
