@@ -55,6 +55,25 @@ jobs:
             }
           }
           EOF
+      - name: Notification permissions
+        run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+      - name: App icon
+        run: |
+          pip install pillow
+          python3 - <<'PY'
+          from PIL import Image
+          import glob,os
+          a=Image.open('icon.png').convert('RGB');f=Image.open('icon-fg.png').convert('RGB')
+          sz={'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}
+          for d,n in sz.items():
+              m='android/app/src/main/res/mipmap-'+d
+              for nm in ('ic_launcher.png','ic_launcher_round.png'):
+                  a.resize((n,n),Image.LANCZOS).save(m+'/'+nm)
+              f.resize((n*108//48,n*108//48),Image.LANCZOS).save(m+'/ic_launcher_foreground.png')
+          for x in glob.glob('android/app/src/main/res/values/ic_launcher_background.xml'):
+              open(x,'w').write('<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#05070E</color></resources>')
+          PY
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
