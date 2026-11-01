@@ -75,6 +75,14 @@ h1{font:700 34px/1 var(--display);letter-spacing:.04em;text-transform:uppercase;
 .sw input:checked+.t::after{transform:translateX(20px);background:var(--accent-ink)}
 .sw input:focus-visible+.t{outline:2px solid var(--accent);outline-offset:2px}
 label.sw{position:relative;cursor:pointer}
+.sheet[data-t="g"] [data-tab]:not([data-tab="g"]),.sheet[data-t="i"] [data-tab]:not([data-tab="i"]),.sheet[data-t="b"] [data-tab]:not([data-tab="b"]){display:none!important}
+.rdot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 2px var(--bg);pointer-events:none}
+.day.rm::after{content:'';position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#ff3b30}
+#bnav button{position:relative}#nvRem .rdot{top:4px;left:calc(50% + 7px);right:auto}
+#remBtn{position:relative}
+.rmi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line)}
+.rmi b{font:600 13px/1.2 var(--body);color:var(--muted);min-width:96px}.rmi span{flex:1;min-width:0;overflow-wrap:anywhere}
+.rmi.past{opacity:.55}
 .sec{display:flex;flex-direction:column;gap:10px}
 .sec h4{margin:0;font:600 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 textarea,.in{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px;resize:vertical}
@@ -290,7 +298,7 @@ html:not([data-logo=img]) .logoimg{display:none}
 /* interface WWW */
 #bnav{display:none}
 html[data-ui=www] #bnav{display:flex;position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:15;max-width:520px;margin:0 auto;gap:2px;padding:6px;border-radius:calc(var(--r)*2.2);background:color-mix(in srgb,var(--bg),#fff 9%);border:1px solid var(--line);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:0 8px 28px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12)}
-#bnav button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;border-radius:calc(var(--r)*1.6);color:var(--muted);font:600 10.5px/1 var(--body);letter-spacing:.02em}
+#bnav button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;border-radius:calc(var(--r)*1.6);color:var(--muted);font:600 9.5px/1 var(--body);letter-spacing:0}
 #bnav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #bnav button.on{color:var(--accent-ink);background:var(--accent)}
 #bnav .ava-s{width:23px;height:23px;border-width:2px!important;font-size:11px;display:flex;overflow:hidden}
@@ -359,7 +367,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   <div class="legend"><span>был в зале</span><span>есть заметка, фото или спортпит</span></div>
   </div>
   <div id="viewList" class="vcol" hidden></div>
-  <div class="row" id="planRow"><button class="btn pri shbtn" id="planBtn">Мой план</button><button class="btn pri shbtn" id="supBtn">Мои добавки</button></div>
+  <div class="row" id="planRow"><button class="btn pri shbtn" id="planBtn">Мой план</button><button class="btn pri shbtn" id="supBtn">Мои добавки</button><button class="btn pri shbtn" id="remBtn" aria-label="Напоминания"><svg style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/></svg><i class="rdot" id="rdOld" hidden></i></button></div>
   <button id="setBtn" hidden>Настройки</button>
 </div>
 
@@ -369,6 +377,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   <button id="nvList"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>Записи</span></button>
   <button id="nvPlan"><svg viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></svg><span>План</span></button>
   <button id="nvSup"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><rect x="6" y="7" width="12" height="14" rx="3"/><path d="M9 14h6"/></svg><span>Добавки</span></button>
+  <button id="nvRem"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/></svg><span>Напомин.</span><i class="rdot" id="rdNav" hidden></i></button>
   <button id="nvMe"><i class="ava-s" id="navAva"></i><span>Профиль</span></button>
 </nav>
 <div class="overlay" id="ov" hidden>
@@ -376,6 +385,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     <div class="sh-head"><h3 id="shTitle"></h3><button class="x" id="close" aria-label="Закрыть">✕</button></div>
     <label class="sw"><span>Был в зале</span><input type="checkbox" id="gym"><span class="t"></span></label>
     <div class="sec"><h4>Заметки</h4><textarea id="note" placeholder="Упражнения, веса, самочувствие"></textarea></div>
+    <div class="sec" id="dayRem" hidden><h4>Напоминание</h4><div id="dayRemL" class="sec"></div></div>
     <div class="sec"><h4>План тренировки</h4>
       <div id="dpl" class="dpl"></div>
       <button class="btn shbtn" id="dplAdd">+ Добавить план или упражнение</button>
@@ -402,6 +412,20 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     <datalist id="exl"><option value="Жим лёжа"><option value="Приседания со штангой"><option value="Становая тяга"><option value="Жим стоя"><option value="Подтягивания"><option value="Тяга штанги в наклоне"><option value="Подъём штанги на бицепс"><option value="Французский жим"><option value="Отжимания на брусьях"><option value="Жим ногами"><option value="Выпады"><option value="Планка"></datalist>
   </div>
 </div>
+<div class="overlay" id="ov6" hidden>
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sh-head"><h3>Напоминания</h3><button class="x" id="close6" aria-label="Закрыть">✕</button></div>
+    <div class="sec">
+      <h4>Новое напоминание</h4>
+      <input class="in" id="rmText" placeholder="Что напомнить" maxlength="80" aria-label="Текст напоминания">
+      <div class="row"><input class="in" id="rmDate" type="date" aria-label="День"><input class="in" id="rmTime" type="time" aria-label="Время (необязательно)"></div>
+      <p class="msg">Время можно не указывать, тогда придёт в 09:00.</p>
+      <button class="btn pri shbtn" id="rmAdd">Добавить</button>
+      <p class="msg" id="rmMsg" role="status"></p>
+    </div>
+    <div class="sec"><h4>Мои напоминания</h4><div id="rmList" class="sec"></div></div>
+  </div>
+</div>
 <div class="overlay" id="ov5" hidden>
   <div class="sheet" role="dialog" aria-modal="true">
     <div class="sh-head"><h3>Мои добавки</h3><button class="x" id="close5" aria-label="Закрыть">✕</button></div>
@@ -411,26 +435,32 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   </div>
 </div>
 <div class="overlay" id="ov3" hidden>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT3">
+  <div class="sheet" data-t="g" role="dialog" aria-modal="true" aria-labelledby="shT3">
     <div class="sh-head"><div style="min-width:0"><h3 id="shT3">Настройки</h3><div id="acSince" style="font-size:12px;opacity:.6;margin-top:4px" hidden></div></div><button class="x" id="close3" aria-label="Закрыть">✕</button></div>
-    <div class="sec" id="acBox">
+    <div class="chips" id="stTabs" style="margin:-4px 0 4px"><button class="chip on" data-t="g">Общее</button><button class="chip" data-t="i">Интерфейс</button><button class="chip" data-t="b">Фон</button></div>
+    <div class="sec" data-tab="g" id="acBox">
       <h4>Аккаунт</h4>
       <p class="msg" id="acMail" style="color:var(--fg)"></p>
       <p class="msg" id="cloudStat"></p>
       <button class="btn shbtn" id="acBtn">Войти</button>
     </div>
-    <div class="sec">
+    <div class="sec" data-tab="i">
       <h4>Интерфейс</h4>
       <div class="chips" id="uis"></div>
       <h4>Логотип</h4>
       <div class="chips" id="lgs"></div>
     </div>
-    <div class="sec">
+    <div class="sec" data-tab="i">
       <h4>Общая тема</h4>
       <div class="chips" id="themes"></div>
       <div id="glassBox"><h4>Оттенок</h4><div class="sws" id="gts"></div><input type="color" id="gtColor" class="colorin" aria-label="Свой оттенок"></div>
     </div>
-    <div class="sec">
+    <div class="sec" data-tab="i"><h4>Шрифт</h4><div class="chips" id="fonts"></div></div>
+    <div class="sec" data-tab="i"><h4>Углы элементов</h4><div class="chips" id="rads"></div></div>
+    <div class="sec" data-tab="i"><h4>Форма дней</h4><div class="chips" id="dshape"></div></div>
+    <div class="sec" data-tab="i"><h4>Цвет акцента</h4><div class="sws" id="accs"></div><input type="color" id="accColor" class="colorin" aria-label="Свой цвет акцента"></div>
+    <div class="sec" data-tab="i"><h4>Цвет выбранных мышц</h4><div class="sws" id="muss"></div><input type="color" id="musColor" class="colorin" aria-label="Свой цвет мышц"></div>
+    <div class="sec" data-tab="g">
       <h4>Профиль</h4>
       <div class="prof"><div class="ava-s" id="avaPrev"></div><input class="in" id="nameIn" placeholder="Твоё имя" maxlength="30" aria-label="Имя"></div>
       <div class="row"><button class="btn shbtn" id="avaBtn">Фото профиля</button><button class="btn shbtn" id="avaDel">Убрать фото</button></div>
@@ -438,9 +468,9 @@ html[data-ds=ci] .day.empty{border-radius:50%}
       <h4>Рамка аватара</h4>
       <div class="sws" id="frames"></div>
     </div>
-    <div class="sec"><h4>Цвет фона</h4><div class="sws" id="sws"></div></div>
-    <div class="sec"><h4>Свой цвет</h4><input type="color" id="bgColor" class="colorin" aria-label="Свой цвет фона"></div>
-    <div class="sec">
+    <div class="sec" data-tab="b"><h4>Цвет фона</h4><div class="sws" id="sws"></div></div>
+    <div class="sec" data-tab="b"><h4>Свой цвет</h4><input type="color" id="bgColor" class="colorin" aria-label="Свой цвет фона"></div>
+    <div class="sec" data-tab="b">
       <h4>Фон приветствия</h4>
       <div class="sws" id="spBgs"></div>
       <input type="color" id="spBgColor" class="colorin" aria-label="Свой цвет фона приветствия">
@@ -448,21 +478,16 @@ html[data-ds=ci] .day.empty{border-radius:50%}
       <input type="file" id="spBgFile" accept="image/*" hidden>
       <button class="btn shbtn" id="spBgView">Посмотреть приветствие</button>
     </div>
-    <div class="sec">
+    <div class="sec" data-tab="b">
       <h4>Фото на фон</h4>
       <button class="btn shbtn" id="bgPhoto">Выбрать фото</button>
       <input type="file" id="bgFile" accept="image/*" hidden>
       <button class="btn shbtn" id="bgReset">Сбросить фон</button>
       <p class="msg" id="msg3" role="status"></p>
     </div>
-    <div class="sec"><h4>Шрифт</h4><div class="chips" id="fonts"></div></div>
-    <div class="sec"><h4>Цвет акцента</h4><div class="sws" id="accs"></div><input type="color" id="accColor" class="colorin" aria-label="Свой цвет акцента"></div>
-    <div class="sec"><h4>Цвет выбранных мышц</h4><div class="sws" id="muss"></div><input type="color" id="musColor" class="colorin" aria-label="Свой цвет мышц"></div>
-    <div class="sec"><h4>Углы элементов</h4><div class="chips" id="rads"></div></div>
-    <div class="sec"><h4>Форма дней</h4><div class="chips" id="dshape"></div></div>
-    <button class="btn shbtn" id="stReset">Сбросить оформление</button>
-    <button class="btn pri shbtn" id="shareBtn">Поделиться данными</button>
-    <div class="rules">
+    <button data-tab="g" class="btn shbtn" id="stReset">Сбросить оформление</button>
+    <button data-tab="g" class="btn pri shbtn" id="shareBtn">Поделиться данными</button>
+    <div class="rules" data-tab="g">
       <h4>Важно: правила кристалла</h4>
       <ul>
         <li>Каждый день с отметкой «Был в зале» добавляет +1 к серии.</li>
@@ -549,7 +574,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     for(var i=0;i<off;i++){var e=document.createElement('div');e.className='day empty';g.appendChild(e)}
     for(var d=1;d<=total;d++){
       var k=key(cur.y,cur.m,d), v=days.get(k), b=document.createElement('button');
-      b.className='day'+(v&&v.gym?' gym':'')+(k===todayKey?' today':'');
+      b.className='day'+(v&&v.gym?' gym':'')+(k===todayKey?' today':'')+(remHas(k)?' rm':'');
       b.setAttribute('aria-label',d+' '+MONTHS[cur.m]+(v&&v.gym?', был в зале':''));
       b.dataset.k=k;
       var dots='';
@@ -573,6 +598,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     $('shTitle').textContent=dt.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
     $('gym').checked=!!v.gym;$('note').value=v.note||'';
     drawSupps();drawPhotos();if(!v.pl)v.pl=[];drawDpl();$('dplPick').hidden=true;
+    remOpenDay(k);
     $('ov').hidden=false;
   }
   function closeDay(){
@@ -744,7 +770,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
         for(var d=1;d<=total;d++){
           var k=key(y,mo,d),v=days.get(k);
           if(!v||isEmpty(v))continue;
-          var b=document.createElement('button');b.className='day'+(v.gym?' gym':'')+(k===todayKey?' today':'');
+          var b=document.createElement('button');b.className='day'+(v.gym?' gym':'')+(k===todayKey?' today':'')+(remHas(k)?' rm':'');
           b.dataset.k=k;var dots='';
           if(v.note)dots+='<i></i>';if(v.supps&&v.supps.length)dots+='<i></i>';if(v.pl&&v.pl.length)dots+='<i></i>';if(v.photos&&v.photos.length)dots+='<i></i>';
           b.innerHTML='<span>'+d+'</span><span class="dots">'+dots+'</span>';
@@ -1163,7 +1189,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   var sups;try{sups=JSON.parse(lsGet('gd-sups')||'[]')}catch(e){sups=[]}
   if(!Array.isArray(sups))sups=[];
   function saveSups(){lsSet('gd-sups',JSON.stringify(sups))}
-  var STY={jar:['Баночка','шт'],bl:['Блистер','шт'],keg:['Бочонок','мл'],pw:['Порошок','г']};
+  var STY={jar:['Баночка','шт'],bl:['Таблетки','шт'],keg:['Бочонок','мл'],pw:['Порошок','г']};
   function supIcon(t){
     var o='<svg viewBox="0 0 64 64" aria-hidden="true"><defs>'
      +'<linearGradient id="gGl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".5" stop-color="#cfe0f2" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>'
@@ -1265,7 +1291,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     var c=$('supNew');c.innerHTML='';c.hidden=!nw;$('supCreate').hidden=!!nw;if(!nw)return;
     c.appendChild(mk('div','lab','Вид добавки'));
     var g=mk('div','stype');
-    [['jar','Таблетки в баночке'],['bl','Таблетки в блистере'],['keg','Бочонок (жидкость)'],['pw','Порошок (граммы)']].forEach(function(o){
+    [['bl','Таблетки'],['keg','Бочонок (жидкость)'],['pw','Порошок (граммы)']].forEach(function(o){
       var b=mk('button',nw.t===o[0]?'on':'');b.innerHTML=supIcon(o[0])+'<span>'+o[1]+'</span>';
       b.onclick=function(){nw.t=o[0];renderNew()};g.appendChild(b);
     });
@@ -1282,7 +1308,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     no.onclick=function(){nw=null;renderNew();renderSups()};
     r.appendChild(ok);r.appendChild(no);c.appendChild(r);
   }
-  $('supCreate').onclick=function(){nw={t:'jar',n:'',v:''};renderNew();renderSups()};
+  $('supCreate').onclick=function(){nw={t:'bl',n:'',v:''};renderNew();renderSups()};
   $('supBtn').onclick=function(){nw=null;renderNew();renderSups();$('ov5').hidden=false};
   $('close5').onclick=function(){$('ov5').hidden=true};
   $('ov5').addEventListener('click',function(e){if(e.target===$('ov5'))$('ov5').hidden=true});
@@ -1341,6 +1367,83 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   showSplash();
 
   if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io|netlify|tiiny/.test(location.host)){try{navigator.serviceWorker.register('sw.js')}catch(e){}}
+  /* reminders */
+  var rems=[];
+  function remLoad(){try{rems=JSON.parse(lsGet('gd-rem')||'[]')||[]}catch(e){rems=[]}}
+  function remSave(){lsSet('gd-rem',JSON.stringify(rems));remRefresh();remSchedule()}
+  function remDue(r){return !r.seen&&remAt(r).getTime()<=Date.now()}
+  function remHas(k){for(var i=0;i<rems.length;i++)if(rems[i].d===k&&remDue(rems[i]))return true;return false}
+  function remRefresh(){
+    var any=rems.some(remDue);
+    ['rdOld','rdNav'].forEach(function(id){var e=$(id);if(e)e.hidden=!any});
+    document.querySelectorAll('.day[data-k]').forEach(function(b){b.classList.toggle('rm',remHas(b.dataset.k))});
+  }
+  function remAt(r){var p=r.d.split('-'),t=(r.t||'09:00').split(':');return new Date(+p[0],+p[1]-1,+p[2],+t[0],+t[1],0)}
+  function remOpenDay(k){
+    var l=rems.filter(function(r){return r.d===k}),box=$('dayRemL');
+    if($('dayRem')){$('dayRem').hidden=!l.length;box.innerHTML='';l.forEach(function(r){var e=document.createElement('div');e.className='rmi';e.innerHTML='<b>'+(r.t||'')+'</b><span></span>';e.lastChild.textContent=r.x;box.appendChild(e)})}
+    var ch=false;l.forEach(function(r){if(remDue(r)){r.seen=true;ch=true}});
+    if(ch){lsSet('gd-rem',JSON.stringify(rems));remRefresh()}
+  }
+  function remDraw(){
+    var box=$('rmList');box.innerHTML='';
+    var l=rems.slice().sort(function(a,b){return remAt(a)-remAt(b)});
+    if(!l.length){var m=document.createElement('p');m.className='msg';m.textContent='Пока пусто';box.appendChild(m);return}
+    l.forEach(function(r){
+      var e=document.createElement('div');e.className='rmi'+(remAt(r)<new Date()?' past':'');
+      var d=remAt(r),b=document.createElement('b');b.textContent=d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+(r.t?' '+r.t:'');
+      var sp=document.createElement('span');sp.textContent=r.x;
+      var x=document.createElement('button');x.className='x';x.textContent='✕';x.setAttribute('aria-label','Удалить');
+      x.onclick=function(){rems=rems.filter(function(q){return q.id!==r.id});remSave();remDraw()};
+      e.appendChild(b);e.appendChild(sp);e.appendChild(x);box.appendChild(e);
+    });
+  }
+  function nid(r){return (+r.id)%2000000000||1}
+  function remSchedule(){
+    var LN=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications;
+    if(!LN)return;
+    try{
+      LN.getPending().then(function(p){return p.notifications&&p.notifications.length?LN.cancel({notifications:p.notifications.map(function(n){return{id:n.id}})}):0}).then(function(){
+        var now=Date.now(),list=rems.filter(function(r){return remAt(r).getTime()>now}).map(function(r){return{id:nid(r),title:'body skill',body:r.x,schedule:{at:remAt(r),allowWhileIdle:true}}});
+        if(list.length)return LN.schedule({notifications:list});
+      }).catch(function(){});
+    }catch(e){}
+  }
+  function remPerm(){
+    var LN=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications;
+    if(LN){try{LN.requestPermissions().catch(function(){})}catch(e){}}
+    else if(window.Notification&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}
+  }
+  /* fallback while app is open (no native plugin) */
+  setInterval(function(){
+    remRefresh();
+    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications)return;
+    var now=Date.now(),ch=false;
+    rems.forEach(function(r){
+      if(!r.fired&&remAt(r).getTime()<=now&&now-remAt(r).getTime()<86400000){
+        r.fired=true;ch=true;
+        try{if(window.Notification&&Notification.permission==='granted')new Notification('body skill',{body:r.x})}catch(e){}
+      }
+    });
+    if(ch)lsSet('gd-rem',JSON.stringify(rems));
+    remRefresh();
+  },20000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)remRefresh()});
+  function remOpen(){remDraw();$('rmMsg').textContent='';if(!$('rmDate').value)$('rmDate').value=todayKey;$('ov6').hidden=false}
+  $('remBtn').onclick=remOpen;$('nvRem').onclick=remOpen;
+  $('close6').onclick=function(){$('ov6').hidden=true};
+  $('ov6').addEventListener('click',function(e){if(e.target===$('ov6'))$('ov6').hidden=true});
+  $('rmAdd').onclick=function(){
+    var x=$('rmText').value.trim(),d=$('rmDate').value,t=$('rmTime').value;
+    if(!x){$('rmMsg').textContent='Напиши, что напомнить';return}
+    if(!d){$('rmMsg').textContent='Выбери день';return}
+    rems.push({id:Date.now(),d:d,t:t||'',x:x,seen:false});
+    $('rmText').value='';$('rmTime').value='';$('rmMsg').textContent='Напоминание добавлено';
+    remPerm();remSave();remDraw();
+  };
+  remLoad();remRefresh();remSchedule();
+  /* settings tabs */
+  (function(){var bx=$('stTabs'),sh=bx.closest('.sheet');bx.onclick=function(e){var b=e.target.closest('[data-t]');if(!b)return;sh.setAttribute('data-t',b.getAttribute('data-t'));bx.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('on',c===b)});sh.scrollTop=0}})();
   /* eye */
   function eyeSvg(open){
     var N=16,c=(N-1)/2,o='<svg viewBox="0 0 '+N+' '+N+'" aria-hidden="true">';
@@ -1374,7 +1477,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
   /* cloud */
   var SB_URL='https://ucfiovmncvuhprebdraf.supabase.co',SB_KEY='sb_publishable_lb-B6DZ7v4I82RMPKDOG7A_vGc3W3N2';
   var CLOUD=!!SB_URL&&!!SB_KEY;
-  var META=['gd-bg','gd-img','gd-font','gd-acc','gd-mus','gd-r','gd-name','gd-ava','gd-fr','gd-plan','gd-sups','gd-th','gd-gt','gd-lv','gd-ui','gd-lg','gd-ds','gd-sbg','gd-simg'];
+  var META=['gd-bg','gd-img','gd-font','gd-acc','gd-mus','gd-r','gd-name','gd-ava','gd-fr','gd-plan','gd-sups','gd-th','gd-gt','gd-lv','gd-ui','gd-lg','gd-ds','gd-sbg','gd-simg','gd-rem'];
   var sess=null,syncing=false,applying=false,pt={},mt;
   function loadSess(){try{sess=JSON.parse(lsGet('gd-sess')||'null')}catch(e){sess=null}}
   function saveSess(x){sess=x;lsSet('gd-sess',x?JSON.stringify(x):null)}
@@ -1459,7 +1562,7 @@ html[data-ds=ci] .day.empty{border-radius:50%}
     try{plan=JSON.parse(lsGet('gd-plan')||'null')}catch(e){plan=null}
     if(!plan||!Array.isArray(plan.w))plan={w:[]};
     try{sups=JSON.parse(lsGet('gd-sups')||'[]')}catch(e){sups=[]}if(!Array.isArray(sups))sups=[];
-    applyBg();applyTheme();applyUi();applyLogo();applyDs();applySpBg();applyStyle();fillAva($('cornerAva'));fillAva($('navAva'));
+    remLoad();remRefresh();applyBg();applyTheme();applyUi();applyLogo();applyDs();applySpBg();applyStyle();fillAva($('cornerAva'));fillAva($('navAva'));
   }
   function sync(){
     if(!sess||syncing)return Promise.resolve();
